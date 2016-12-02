@@ -1,4 +1,5 @@
---This file is init.lua
+-- prevent infinity loops :D
+
 local IDLE_AT_STARTUP_MS = 10000;
 
 tmr.alarm(1,IDLE_AT_STARTUP_MS,0,function()
