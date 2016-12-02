@@ -1,18 +1,15 @@
-led1 = 3
-led2 = 4
-gpio.mode(led1, gpio.OUTPUT)
-gpio.mode(led2, gpio.OUTPUT)
+servo1 = 3
+gpio.mode(servo1, gpio.OUTPUT)
 
 
 if srv~=nil then
   srv:close()
 
 else
-    srv = net.createServer(net.TCP)    
+    srv = net.createServer(net.TCP)
 end
 
-
-
+-- listen 2 your <3
 srv:listen(80,function(connection)
     connection:on("receive", function(client,request)
         local buf = "";
@@ -26,18 +23,13 @@ srv:listen(80,function(connection)
                 _GET[k] = v
             end
         end
-        buf = buf.."<h1> ESP8266 Web Server</h1>";
-        buf = buf.."<p>GPIO0 <a href=\"?pin=ON1\"><button>ON</button></a>&nbsp;<a href=\"?pin=OFF1\"><button>OFF</button></a></p>";
-        buf = buf.."<p>GPIO2 <a href=\"?pin=ON2\"><button>ON</button></a>&nbsp;<a href=\"?pin=OFF2\"><button>OFF</button></a></p>";
+        buf = buf.."<h1>Iot Testpage</h1>";
+        buf = buf.."<p>Servo(GPIO1) <a href=\"?pin=ON1\"><button>ON</button></a>&nbsp;<a href=\"?pin=OFF1\"><button>OFF</button></a></p>";
         local _on,_off = "",""
         if(_GET.pin == "ON1")then
-              gpio.write(led1, gpio.HIGH);
+              gpio.write(servo1, gpio.HIGH);
         elseif(_GET.pin == "OFF1")then
-              gpio.write(led1, gpio.LOW);
-        elseif(_GET.pin == "ON2")then
-              gpio.write(led2, gpio.HIGH);
-        elseif(_GET.pin == "OFF2")then
-              gpio.write(led2, gpio.LOW);
+              gpio.write(servo1, gpio.LOW);
         end
         client:send(buf);
         client:close();
