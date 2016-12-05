@@ -3,8 +3,10 @@
 
 // Sensor-Typ: HC-SRO4 Sensor
 #include <NewPing.h>
-
 #include <pitches.h>
+
+// include the library code:
+#include <LiquidCrystal.h>
 
 #define TRIGGER_PIN  12  // trigger pin
 #define ECHO_PIN     11  // echo pin
@@ -15,7 +17,7 @@ NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE); // NewPing setup of pins and
 int tempPin = 0;
 
 
-// for DHT11, 
+// for DHT11,
 //      VCC: 5V or 3V
 //      GND: GND
 //      DATA: 2
@@ -36,9 +38,13 @@ int pirVal = 0;                    // variable for reading the pin status
 //  NOTE_C5, NOTE_D5, NOTE_E5, NOTE_F5, NOTE_G5, NOTE_A5, NOTE_B5, NOTE_C6};
 
 int init_melody[] = {NOTE_B5, NOTE_B5};
-int duration = 200; 
-int buzzer_pin = 8; 
+int duration = 200;
+int buzzer_pin = 8;
 
+
+
+// initialize the library with the numbers of the interface pins
+LiquidCrystal lcd(9, 4, 10, 13, 4, 1);
 
 
 void setup() {
@@ -47,34 +53,45 @@ void setup() {
   pinMode(PIR_inputPin, INPUT);     // declare PIR sensor as input
 
   Serial.begin(9600); // Open serial monitor at 115200 baud to see ping results.
-  
+
   for (int thisNote = 0; thisNote < 8; thisNote++) {
     // pin8 output the voice, every scale is 0.5 sencond
     tone(buzzer_pin, init_melody[thisNote], duration);
-     
+
     // Output the voice after several minutes
     delay(500);
   }
+
+  // set up the LCD's number of columns and rows:
+  lcd.begin(16, 2);
+  // Print a message to the LCD.
+  lcd.print("hello, world!");
 }
 
-void loop() 
+void loop()
 {
-  
-  for(int i=0; i < 10; i++)
+
+// set the cursor to column 0, line 1
+  // (note: line 1 is the second row, since counting begins with 0):
+  lcd.setCursor(0, 1);
+  // print the number of seconds since reset:
+  lcd.print(millis() / 1000);
+
+  for (int i = 0; i < 10; i++)
   {
     detectMotion(); //no delay
-    
+
     readTemp(); //no delay
     delay(50);
   }
-  
+
   //tone(buzzer_pin, NOTE_C6, duration);
-  
+
   //delay(500);
-  
+
   readTempHumi(); //no delay
   pingSonar();
-  
+
 }
 
 void detectMotion()
@@ -90,7 +107,7 @@ void detectMotion()
     }
   } else {
     digitalWrite(PIR_ledPin, LOW); // turn LED OFF
-    if (pirState == HIGH){
+    if (pirState == HIGH) {
       // we have just turned of
       Serial.println("Motion ended!");
       // We only want to print on the output change, not state
@@ -111,7 +128,7 @@ void readTempHumi()
     tone(buzzer_pin, NOTE_D6, duration);
     return;
   }
-  
+
   Serial.print("Sample OK: ");
   Serial.print((int)temperature); Serial.print(" *C, ");
   Serial.print((int)humidity); Serial.println(" %");
@@ -121,13 +138,13 @@ void readTemp()
 {
   // Display Temperature in C
   int tempReading = analogRead(tempPin);
-  
+
   float tempVolts = tempReading * 5.0 / 1024.0;
   float tempC = (tempVolts - 0.5) * 10.0;
   //float tempC = (tempVolts - 0.5) / 10.0;
   float tempF = tempC * 9.0 / 5.0 + 32.0;
 
-  if(tempC < 12.0 )
+  if (tempC < 12.0 )
   {
     tone(buzzer_pin, NOTE_C6, 200);
     delay(1000);
